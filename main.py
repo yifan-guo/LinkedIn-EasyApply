@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, NoSuchElementException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 import re
@@ -151,24 +151,28 @@ class EasyApplyLinkedin:
 
         print('You are applying to the position of: ', job_add.text)
         job_add.click()
-        # time.sleep(2)
+        time.sleep(2)
+        # already_applied = self.driver.find_element(By.XPATH, "//a[@href='/jobs/tracker/applied']")
         
         # click on the easy apply button, skip if already applied to the position
         try:
-            # in_apply = self.driver.find_element(By.XPATH, "//button[contains(@class, 'jobs-apply-button')]")
-            wait = WebDriverWait(self.driver, 5, ignored_exceptions=[StaleElementReferenceException])
-            in_apply = self.driver.find_element(By.CLASS_NAME, "jobs-apply-button")
+            in_apply = self.driver.find_element(By.XPATH, "//button[contains(@class, 'jobs-apply-button')]")
+            
+            
+            # in_apply = self.driver.find_element(By.CLASS_NAME, "jobs-apply-button")
+            # time.sleep(20)
+            wait = WebDriverWait(self.driver, 10, ignored_exceptions=[StaleElementReferenceException])
+            # in_apply = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "jobs-apply-button")))
+            # in_apply = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'jobs-apply-button')]")))
             print("got jobs apply element")
-            time.sleep(20)
-            in_apply = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "jobs-apply-button")))
             in_apply.click()
         except NoSuchElementException:
-            print('You already applied to this job, go to next...')
+            print('Could not find EasyApply button. You already applied to this job, go to next...')
             return
         except StaleElementReferenceException:
             print('retry getting stale element')
             time.sleep(20)
-            in_apply = self.driver.find_element(By.CLASS_NAME, "jobs-apply-button")
+            in_apply = self.driver.find_element(By.XPATH, "//button[contains(@class, 'jobs-apply-button')]")
             in_apply.click()
 
         
