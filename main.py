@@ -113,37 +113,33 @@ class EasyApplyLinkedin:
             # titles = result.find_elements(By.CLASS_NAME, 'job-card-search__title.artdeco-entity-lockup__title.ember-view')
             titles = result.find_elements(By.CSS_SELECTOR, '.artdeco-entity-lockup__title.ember-view')
             for title in titles:
-                self.submit_apply(title)
+                # self.submit_apply(title)
+                pass
 
         # if there is more than one page, find the pages and apply to the results of each page
-        if total_results_int > 24:
+        page_state = self.driver.find_element(By.CLASS_NAME, "artdeco-pagination__page-state")
+        page_state_text = page_state.get_attribute("innerHTML").strip()
+        total_pages_int = int(page_state_text.split(' ')[-1])
+        print("total_pages: {}".format(total_pages_int))
+        current_page = 1
+        while current_page < total_pages_int:
+            current_page += 1
             time.sleep(2)
 
-            # find the last page and construct url of each page based on the total amount of pages
-            # find_pages = self.driver.find_elements(By.CLASS_NAME, "artdeco-pagination__indicator.artdeco-pagination__indicator--number")
-            page_state = self.driver.find_element(By.CLASS_NAME, "artdeco-pagination__page-state")
-            page_state_text = page_state.get_attribute("innerHTML").strip()
-            total_pages_int = int(page_state_text.split(' ')[-1])
-            print("total_pages: {}".format(total_pages_int))
-            get_last_page = self.driver.find_element(By.XPATH, "//button[@aria-label='Page "+str(total_pages_int)+"']")
-            get_last_page.send_keys(Keys.RETURN)
-            time.sleep(2)
-            last_page = self.driver.current_url
-            total_jobs = int(last_page.split('start=',1)[1])
+            # go to the next page
+            get_next_page = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Page "+str(current_page)+"']")))
+            get_next_page.click()
+        
+            # go through all available job offers on this page and apply
+            results_ext = self.driver.find_elements(By.CSS_SELECTOR, ".job-card-container.relative")
+            for result_ext in results_ext:
+                hover_ext = ActionChains(self.driver).move_to_element(result_ext)
+                hover_ext.perform()
+                # titles_ext = result_ext.find_elements(By.CLASS_NAME, 'job-card-search__title.artdeco-entity-lockup__title.ember-view')
+                titles_ext = result_ext.find_elements(By.CSS_SELECTOR, '.artdeco-entity-lockup__title.ember-view')
+                for title_ext in titles_ext:
+                    self.submit_apply(title_ext)
 
-            # go through all available pages and job offers and apply
-            for page_number in range(25,total_jobs+25,25):
-                self.driver.get(current_page+'&start='+str(page_number))
-                time.sleep(2)
-                # results_ext = self.driver.find_elements(By.CLASS_NAME, "occludable-update.artdeco-list__item--offset-4.artdeco-list__item.p0.ember-view")
-                results_ext = self.driver.find_elements(By.CSS_SELECTOR, ".job-card-container.relative")
-                for result_ext in results_ext:
-                    hover_ext = ActionChains(self.driver).move_to_element(result_ext)
-                    hover_ext.perform()
-                    # titles_ext = result_ext.find_elements(By.CLASS_NAME, 'job-card-search__title.artdeco-entity-lockup__title.ember-view')
-                    titles_ext = result_ext.find_elements(By.CSS_SELECTOR, '.artdeco-entity-lockup__title.ember-view')
-                    for title_ext in titles_ext:
-                        self.submit_apply(title_ext)
         else:
             self.close_session()
 
