@@ -121,9 +121,10 @@ class EasyApplyLinkedin:
 
             # find the last page and construct url of each page based on the total amount of pages
             # find_pages = self.driver.find_elements(By.CLASS_NAME, "artdeco-pagination__indicator.artdeco-pagination__indicator--number")
-            find_pages = self.driver.find_elements(By.CLASS_NAME, "artdeco-pagination__indicator.artdeco-pagination__indicator--number.ember-view")
-            total_pages = find_pages[len(find_pages)-1].text
-            total_pages_int = int(re.sub(r"[^\d.]", "", total_pages))
+            page_state = self.driver.find_element(By.CLASS_NAME, "artdeco-pagination__page-state")
+            page_state_text = page_state.get_attribute("innerHTML").strip()
+            total_pages_int = int(page_state_text.split(' ')[-1])
+            print("total_pages: {}".format(total_pages_int))
             get_last_page = self.driver.find_element(By.XPATH, "//button[@aria-label='Page "+str(total_pages_int)+"']")
             get_last_page.send_keys(Keys.RETURN)
             time.sleep(2)
