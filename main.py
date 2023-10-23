@@ -160,11 +160,7 @@ class EasyApplyLinkedin:
             # time.sleep(20)
             wait = WebDriverWait(self.driver, 10, ignored_exceptions=[StaleElementReferenceException])
             # in_apply = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "jobs-apply-button")))
-<<<<<<< HEAD
             # in_apply = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'jobs-apply-button')]")))
-=======
-            wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'jobs-apply-button')]")))
->>>>>>> 0520e682606877ed81a69386ecdfb8b81cf6757c
             print("got jobs apply element")
             in_apply.click()
         except NoSuchElementException:
